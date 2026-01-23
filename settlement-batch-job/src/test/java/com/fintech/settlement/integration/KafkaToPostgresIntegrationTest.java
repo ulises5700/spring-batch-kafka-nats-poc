@@ -56,7 +56,7 @@ class KafkaToPostgresIntegrationTest {
     @Container
     @SuppressWarnings("resource")
     static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>(
-            DockerImageName.parse("docker.io/library/postgres:16-alpine"))
+            DockerImageName.parse("docker.io/library/postgres:16-alpine").asCompatibleSubstituteFor("postgres"))
             .withDatabaseName("settlement_test_db")
             .withUsername("test")
             .withPassword("test");
@@ -64,7 +64,8 @@ class KafkaToPostgresIntegrationTest {
     @Container
     @SuppressWarnings("resource")
     static KafkaContainer kafka = new KafkaContainer(
-            DockerImageName.parse("docker.io/confluentinc/cp-kafka:7.5.0"));
+            DockerImageName.parse("docker.io/confluentinc/cp-kafka:7.5.0")
+                    .asCompatibleSubstituteFor("confluentinc/cp-kafka"));
 
     @Autowired
     private StagedTransactionRepository repository;
