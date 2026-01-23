@@ -7,14 +7,16 @@ import java.time.Instant;
 /**
  * Entity representing a staged transaction awaiting settlement processing.
  * 
- * <p>Transactions are staged in this table after being consumed from Kafka.
- * The Spring Batch job reads from this table and processes records in batches.</p>
+ * <p>
+ * Transactions are staged in this table after being consumed from Kafka.
+ * The Spring Batch job reads from this table and processes records in batches.
+ * </p>
  */
 @Entity
 @Table(name = "staged_transactions", indexes = {
-    @Index(name = "idx_staged_status", columnList = "processing_status"),
-    @Index(name = "idx_staged_issuer", columnList = "issuer_bank_id"),
-    @Index(name = "idx_staged_created", columnList = "created_at")
+        @Index(name = "idx_staged_status", columnList = "processing_status"),
+        @Index(name = "idx_staged_issuer", columnList = "issuer_bank_id"),
+        @Index(name = "idx_staged_created", columnList = "created_at")
 })
 public class StagedTransaction {
 
@@ -94,53 +96,138 @@ public class StagedTransaction {
     }
 
     // Getters and Setters
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
+    public Long getId() {
+        return id;
+    }
 
-    public String getTransactionId() { return transactionId; }
-    public void setTransactionId(String transactionId) { this.transactionId = transactionId; }
+    public void setId(Long id) {
+        this.id = id;
+    }
 
-    public String getPayerId() { return payerId; }
-    public void setPayerId(String payerId) { this.payerId = payerId; }
+    public String getTransactionId() {
+        return transactionId;
+    }
 
-    public String getPayeeId() { return payeeId; }
-    public void setPayeeId(String payeeId) { this.payeeId = payeeId; }
+    public void setTransactionId(String transactionId) {
+        this.transactionId = transactionId;
+    }
 
-    public BigDecimal getAmount() { return amount; }
-    public void setAmount(BigDecimal amount) { this.amount = amount; }
+    public String getPayerId() {
+        return payerId;
+    }
 
-    public String getCurrency() { return currency; }
-    public void setCurrency(String currency) { this.currency = currency; }
+    public void setPayerId(String payerId) {
+        this.payerId = payerId;
+    }
 
-    public String getIssuerBankId() { return issuerBankId; }
-    public void setIssuerBankId(String issuerBankId) { this.issuerBankId = issuerBankId; }
+    public String getPayeeId() {
+        return payeeId;
+    }
 
-    public String getAcquirerBankId() { return acquirerBankId; }
-    public void setAcquirerBankId(String acquirerBankId) { this.acquirerBankId = acquirerBankId; }
+    public void setPayeeId(String payeeId) {
+        this.payeeId = payeeId;
+    }
 
-    public String getMerchantCategoryCode() { return merchantCategoryCode; }
-    public void setMerchantCategoryCode(String merchantCategoryCode) { this.merchantCategoryCode = merchantCategoryCode; }
+    public BigDecimal getAmount() {
+        return amount;
+    }
 
-    public String getOriginCountry() { return originCountry; }
-    public void setOriginCountry(String originCountry) { this.originCountry = originCountry; }
+    public void setAmount(BigDecimal amount) {
+        this.amount = amount;
+    }
 
-    public Instant getAuthorizedAt() { return authorizedAt; }
-    public void setAuthorizedAt(Instant authorizedAt) { this.authorizedAt = authorizedAt; }
+    public String getCurrency() {
+        return currency;
+    }
 
-    public Instant getCreatedAt() { return createdAt; }
-    public void setCreatedAt(Instant createdAt) { this.createdAt = createdAt; }
+    public void setCurrency(String currency) {
+        this.currency = currency;
+    }
 
-    public ProcessingStatus getProcessingStatus() { return processingStatus; }
-    public void setProcessingStatus(ProcessingStatus processingStatus) { this.processingStatus = processingStatus; }
+    public String getIssuerBankId() {
+        return issuerBankId;
+    }
 
-    public String getBatchId() { return batchId; }
-    public void setBatchId(String batchId) { this.batchId = batchId; }
+    public void setIssuerBankId(String issuerBankId) {
+        this.issuerBankId = issuerBankId;
+    }
 
-    public Instant getProcessedAt() { return processedAt; }
-    public void setProcessedAt(Instant processedAt) { this.processedAt = processedAt; }
+    public String getAcquirerBankId() {
+        return acquirerBankId;
+    }
 
-    public Long getVersion() { return version; }
-    public void setVersion(Long version) { this.version = version; }
+    public void setAcquirerBankId(String acquirerBankId) {
+        this.acquirerBankId = acquirerBankId;
+    }
+
+    public String getMerchantCategoryCode() {
+        return merchantCategoryCode;
+    }
+
+    public void setMerchantCategoryCode(String merchantCategoryCode) {
+        this.merchantCategoryCode = merchantCategoryCode;
+    }
+
+    public String getOriginCountry() {
+        return originCountry;
+    }
+
+    public void setOriginCountry(String originCountry) {
+        this.originCountry = originCountry;
+    }
+
+    public Instant getAuthorizedAt() {
+        return authorizedAt;
+    }
+
+    public void setAuthorizedAt(Instant authorizedAt) {
+        this.authorizedAt = authorizedAt;
+    }
+
+    public Instant getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(Instant createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public ProcessingStatus getProcessingStatus() {
+        return processingStatus;
+    }
+
+    public void setProcessingStatus(ProcessingStatus processingStatus) {
+        this.processingStatus = processingStatus;
+    }
+
+    // Helper method for tests - returns status as string
+    public String getStatus() {
+        return processingStatus != null ? processingStatus.name() : null;
+    }
+
+    public String getBatchId() {
+        return batchId;
+    }
+
+    public void setBatchId(String batchId) {
+        this.batchId = batchId;
+    }
+
+    public Instant getProcessedAt() {
+        return processedAt;
+    }
+
+    public void setProcessedAt(Instant processedAt) {
+        this.processedAt = processedAt;
+    }
+
+    public Long getVersion() {
+        return version;
+    }
+
+    public void setVersion(Long version) {
+        this.version = version;
+    }
 
     /**
      * Processing status enumeration.

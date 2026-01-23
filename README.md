@@ -4,27 +4,59 @@
 ![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.2-green?style=flat-square&logo=springboot)
 ![Apache Kafka](https://img.shields.io/badge/Apache%20Kafka-3.5-black?style=flat-square&logo=apachekafka)
 ![NATS](https://img.shields.io/badge/NATS-2.10-27AAE1?style=flat-square&logo=nats.io)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-336791?style=flat-square&logo=postgresql)
+![Resilience4j](https://img.shields.io/badge/Resilience4j-Circuit%20Breaker-green?style=flat-square)
 ![Podman](https://img.shields.io/badge/Podman-Compatible-892CA0?style=flat-square&logo=podman)
 ![License](https://img.shields.io/badge/License-MIT-blue?style=flat-square)
 
 > **📘 Architectural Deep Dive**: For a detailed explanation of the "Hot vs Cold" path strategy, technical learnings, and component breakdown, read the [**Project Summary & Architecture Notes**](./SUMMARY.md).
 
-## Executive Summary
+---
 
-This **Proof of Concept (POC)** simulates a **high-velocity Clearing & Settlement System** designed for a global payment processor handling millions of daily transactions. The architecture addresses a fundamental challenge in financial systems: **balancing ultra-low latency for real-time validations with robust, consistent batch processing for settlement operations**.
+## 🎯 Core Architecture: Hot Path vs. Cold Path
 
-### The Problem
+This system implements a **Hybrid Event-Driven Architecture (EDA)** that solves a fundamental trade-off in financial systems:
 
-Modern payment processors must:
-- Validate transactions in **sub-millisecond timeframes** (fraud checks, limits)
-- Guarantee **exactly-once processing** for financial reconciliation
-- Handle **burst traffic** without data loss
-- Generate **auditable settlement files** for banking partners
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                      THE LATENCY vs. DURABILITY DILEMMA                     │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│   ⚡ HOT PATH (NATS)                    🧊 COLD PATH (Kafka)                │
+│   ─────────────────                    ──────────────────                   │
+│   • Sub-millisecond latency            • 100% message durability            │
+│   • Synchronous Request-Reply          • Ordered event log                  │
+│   • Ephemeral (no disk I/O)            • Replay & reprocessing              │
+│   • Real-time fraud decisions          • Settlement source of truth         │
+│                                                                             │
+│   USE CASE: "Is this valid NOW?"       USE CASE: "Never lose this event"    │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
 
-This POC demonstrates a hybrid Event-Driven Architecture (EDA) that combines:
-- **Synchronous low-latency paths** for real-time decisions
-- **Asynchronous durable messaging** as the source of truth
-- **Transactional batch processing** for end-of-cycle settlement
+### Why Two Messaging Systems?
+
+| Scenario | Wrong Choice | Right Choice |
+|----------|--------------|--------------|
+| Fraud check (blocking) | Kafka (adds 10-50ms latency) | **NATS** (~1ms) |
+| Transaction audit log | NATS (no persistence) | **Kafka** (durable) |
+| Real-time validation | Kafka (overkill, complex) | **NATS** (simple, fast) |
+| Settlement processing | NATS (can't replay) | **Kafka** (replayable) |
+
+### The Core Value Proposition
+
+> **Decoupling real-time validation from persistent settlement** allows each subsystem to optimize for its primary concern without compromise.
+
+---
+
+## Production-Ready Features
+
+| Feature | Technology | Purpose |
+|---------|------------|---------|
+| **Persistence** | PostgreSQL + Flyway | Real database with schema migrations |
+| **Resiliency** | Resilience4j Circuit Breaker | Graceful degradation when NATS fails |
+| **Observability** | Micrometer Tracing + Zipkin | Distributed traceId across all services |
+| **Testing** | Testcontainers | Integration tests with real Kafka/PostgreSQL |
 
 ---
 
@@ -38,6 +70,7 @@ flowchart TB
     
     subgraph Gateway["Payment Gateway Service :8081"]
         B[REST Controller<br>/api/v1/payments]
+        CB[🛡️ Circuit Breaker]
         C[NATS Client]
         D[Kafka Producer]
         W[WebSocket Server]
@@ -56,9 +89,13 @@ flowchart TB
     
     subgraph Settlement["Settlement Batch Job :8083"]
         I[Kafka Consumer]
-        J[(H2 Staging DB)]
+        J[(PostgreSQL<br>Staging DB)]
         K[Spring Batch Job]
         L[CSV Writer]
+    end
+    
+    subgraph Observability["Observability Stack"]
+        Z[(Zipkin<br>:9411)]
     end
     
     subgraph Output
@@ -66,11 +103,14 @@ flowchart TB
     end
     
     A -->|POST /payments| B
-    B -->|1. Request-Reply| C
+    B -->|1. Protected call| CB
+    CB -->|Request-Reply| C
     C <-->|Sync ~1ms| G
     G <-->|fraud.check| E
     E --> F
     F -->|Approve/Reject| E
+    
+    CB -.->|Fallback on failure| B
     
     C -->|2. If approved| D
     D -->|Async publish| H
@@ -83,26 +123,33 @@ flowchart TB
     
     W -.->|Real-time logs| UI
     
+    B -.->|traceId| Z
+    E -.->|traceId| Z
+    I -.->|traceId| Z
+    
     style G fill:#27AAE1,color:#fff
     style H fill:#231F20,color:#fff
-    style J fill:#4479A1,color:#fff
+    style J fill:#336791,color:#fff
     style UI fill:#7C3AED,color:#fff
+    style CB fill:#10B981,color:#fff
+    style Z fill:#FF6B35,color:#fff
 ```
 
 ### Data Flow
 
 1. **Payment Request** → Client submits payment via REST API
-2. **Fraud Validation** → Gateway performs synchronous NATS request-reply (~1ms)
-3. **Event Publication** → Approved transactions published to Kafka topic
-4. **Event Consumption** → Settlement service stages transactions to H2
-5. **Batch Settlement** → Spring Batch job processes staged records to CSV files
-6. **Real-time Monitoring** → Dashboard shows live metrics via WebSocket
+2. **Circuit Breaker** → Resilience4j protects the NATS call with fallback
+3. **Fraud Validation** → Gateway performs synchronous NATS request-reply (~1ms)
+4. **Event Publication** → Approved transactions published to Kafka topic
+5. **Event Consumption** → Settlement service stages transactions to PostgreSQL
+6. **Batch Settlement** → Spring Batch job processes staged records to CSV files
+7. **Distributed Tracing** → TraceId propagates through NATS → Kafka → Batch
 
 ---
 
 ## Tech Stack Justification
 
-### Why NATS for Fraud Checks?
+### Why NATS for Fraud Checks? (Hot Path)
 
 | Requirement | NATS Advantage |
 |-------------|----------------|
@@ -111,7 +158,7 @@ flowchart TB
 | **No persistence needed** | Fraud decisions are ephemeral |
 | **Simple operations** | Zero configuration clustering |
 
-### Why Apache Kafka for Event Streaming?
+### Why Apache Kafka for Event Streaming? (Cold Path)
 
 | Requirement | Kafka Advantage |
 |-------------|-----------------|
@@ -218,6 +265,15 @@ mvn clean install -DskipTests
 ```
 
 ### 4. Run the Services
+
+You can start all services automatically using the provided PowerShell script or run them manually.
+
+**Option A: Automated Script (Recommended)**
+```powershell
+./start-dev-env.ps1
+```
+
+**Option B: Manual Start**
 
 Open **three terminals** and run each service:
 

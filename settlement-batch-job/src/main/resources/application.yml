@@ -4,6 +4,86 @@ server:
 spring:
   application:
     name: settlement-batch-job
+  
+  # PostgreSQL Configuration (Production)
+  datasource:
+    url: jdbc:postgresql://localhost:5432/settlement_db
+    username: fintech
+    password: fintech_secret
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 5
+      connection-timeout: 30000
+  
+  # JPA Configuration
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+  
+  # Flyway Configuration
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    baseline-on-migrate: true
+    validate-on-migrate: true
+  
+  # Kafka Configuration
+  kafka:
+    bootstrap-servers: localhost:9092
+    consumer:
+      group-id: settlement-service-group
+      auto-offset-reset: earliest
+      enable-auto-commit: false
+      properties:
+        spring.json.trusted.packages: com.fintech.common.event
+  
+  # Spring Batch Configuration
+  batch:
+    job:
+      enabled: false
+    jdbc:
+      initialize-schema: always
+
+# Settlement Configuration
+settlement:
+  batch:
+    chunk-size: 100
+  output:
+    directory: ./output
+
+# Distributed Tracing Configuration
+management:
+  tracing:
+    sampling:
+      probability: 1.0
+  zipkin:
+    tracing:
+      endpoint: http://localhost:9411/api/v2/spans
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+
+# Logging with TraceId
+logging:
+  level:
+    root: INFO
+    com.fintech.settlement: DEBUG
+  pattern:
+    level: "%5p [${spring.application.name:},%X{traceId:-},%X{spanId:-}]"
+
+---
+# H2 Profile for local development without PostgreSQL
+spring:
+  config:
+    activate:
+      on-profile: h2
   datasource:
     url: jdbc:h2:file:./data/settlement-db;DB_CLOSE_DELAY=-1
     driver-class-name: org.h2.Driver
@@ -16,32 +96,5 @@ spring:
   jpa:
     hibernate:
       ddl-auto: update
-    show-sql: false
-  kafka:
-    bootstrap-servers: localhost:9092
-    consumer:
-      group-id: settlement-service-group
-      auto-offset-reset: earliest
-      enable-auto-commit: false
-  batch:
-    job:
-      enabled: false
-    jdbc:
-      initialize-schema: always
-
-settlement:
-  batch:
-    chunk-size: 100
-  output:
-    directory: ./output
-
-logging:
-  level:
-    root: INFO
-    com.fintech.settlement: DEBUG
-
-management:
-  endpoints:
-    web:
-      exposure:
-        include: health,info,metrics
+  flyway:
+    enabled: false

@@ -5,36 +5,31 @@ spring:
   application:
     name: fraud-stub-service
 
-# NATS Configuration
 nats:
   server:
     url: nats://localhost:4222
-  connection:
-    name: fraud-stub-service
-  subject:
-    fraud-check: fraud.check
 
-# Fraud Detection Rules Configuration
 fraud:
   threshold:
     amount: 1000
-    currency: USD
 
-# Logging Configuration
-logging:
-  level:
-    root: INFO
-    com.fintech.fraud: DEBUG
-    io.nats: INFO
-  pattern:
-    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
-
-# Actuator for health checks
+# Distributed Tracing Configuration
 management:
+  tracing:
+    sampling:
+      probability: 1.0
+  zipkin:
+    tracing:
+      endpoint: http://localhost:9411/api/v2/spans
   endpoints:
     web:
       exposure:
         include: health,info,metrics
-  endpoint:
-    health:
-      show-details: always
+
+# Logging with TraceId
+logging:
+  level:
+    root: INFO
+    com.fintech.fraud: DEBUG
+  pattern:
+    level: "%5p [${spring.application.name:},%X{traceId:-},%X{spanId:-}]"

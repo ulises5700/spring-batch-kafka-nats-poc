@@ -1,5 +1,5 @@
 # Podman-compatible Docker Compose for FinTech POC Infrastructure
-# Usage: podman-compose up -d
+# Usage: podman compose up -d
 #
 # Configuration: Copy .env.example to .env and customize as needed
 
@@ -21,7 +21,7 @@ services:
     networks:
       - fintech-network
     healthcheck:
-      test: ["CMD", "echo", "ruok", "|", "nc", "localhost", "2181", "|", "grep", "imok"]
+      test: [ "CMD", "echo", "ruok", "|", "nc", "localhost", "2181", "|", "grep", "imok" ]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -55,7 +55,7 @@ services:
     networks:
       - fintech-network
     healthcheck:
-      test: ["CMD-SHELL", "kafka-broker-api-versions --bootstrap-server localhost:9092"]
+      test: [ "CMD-SHELL", "kafka-broker-api-versions --bootstrap-server localhost:9092" ]
       interval: 10s
       timeout: 10s
       retries: 5
@@ -70,7 +70,7 @@ services:
       - "${NATS_CLIENT_PORT:-4222}:4222"
       - "${NATS_HTTP_PORT:-8222}:8222"
       - "${NATS_CLUSTER_PORT:-6222}:6222"
-    command: 
+    command:
       - "--http_port=8222"
       - "--jetstream"
       - "--store_dir=/data"
@@ -79,11 +79,49 @@ services:
     networks:
       - fintech-network
     healthcheck:
-      test: ["CMD", "wget", "-q", "--spider", "http://localhost:8222/healthz"]
+      test: [ "CMD", "wget", "-q", "--spider", "http://localhost:8222/healthz" ]
       interval: 10s
       timeout: 5s
       retries: 5
       start_period: 5s
+
+  # PostgreSQL Database for Settlement Staging
+  postgres:
+    image: docker.io/library/postgres:16-alpine
+    container_name: postgres
+    hostname: postgres
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-fintech}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-fintech_secret}
+      POSTGRES_DB: ${POSTGRES_DB:-settlement_db}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - fintech-network
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U fintech -d settlement_db" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  # Zipkin for Distributed Tracing
+  zipkin:
+    image: docker.io/openzipkin/zipkin:latest
+    container_name: zipkin
+    hostname: zipkin
+    ports:
+      - "${ZIPKIN_PORT:-9411}:9411"
+    networks:
+      - fintech-network
+    healthcheck:
+      test: [ "CMD", "wget", "-q", "--spider", "http://localhost:9411/health" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
 
   # Kafka UI for monitoring and management
   kafka-ui:
@@ -92,7 +130,7 @@ services:
     hostname: kafka-ui
     depends_on:
       kafka:
-        condition: service_healthy
+        condition: service_started
     ports:
       - "${KAFKA_UI_PORT:-8080}:8080"
     environment:
@@ -113,6 +151,8 @@ volumes:
   kafka_data:
     driver: local
   nats_data:
+    driver: local
+  postgres_data:
     driver: local
 
 # Custom network for service discovery

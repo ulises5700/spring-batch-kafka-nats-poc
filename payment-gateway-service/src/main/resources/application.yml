@@ -16,13 +16,55 @@ nats:
   timeout:
     ms: 2000
 
+# Resilience4j Circuit Breaker Configuration
+resilience4j:
+  circuitbreaker:
+    instances:
+      fraudCheck:
+        registerHealthIndicator: true
+        slidingWindowSize: 10
+        minimumNumberOfCalls: 5
+        permittedNumberOfCallsInHalfOpenState: 3
+        automaticTransitionFromOpenToHalfOpenEnabled: true
+        waitDurationInOpenState: 10s
+        failureRateThreshold: 50
+        eventConsumerBufferSize: 10
+        recordExceptions:
+          - java.lang.Exception
+          - java.lang.RuntimeException
+          - java.io.IOException
+  timelimiter:
+    instances:
+      fraudCheck:
+        timeoutDuration: 3s
+        cancelRunningFuture: true
+
+# Fallback Configuration
+resilience:
+  fallback:
+    max-amount: 500
+
+# Distributed Tracing Configuration
+management:
+  tracing:
+    sampling:
+      probability: 1.0
+  zipkin:
+    tracing:
+      endpoint: http://localhost:9411/api/v2/spans
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,circuitbreakers,circuitbreakerevents
+  health:
+    circuitbreakers:
+      enabled: true
+
+# Logging with TraceId
 logging:
   level:
     root: INFO
     com.fintech.gateway: DEBUG
-
-management:
-  endpoints:
-    web:
-      exposure:
-        include: health,info,metrics
+    io.github.resilience4j: INFO
+  pattern:
+    level: "%5p [${spring.application.name:},%X{traceId:-},%X{spanId:-}]"
