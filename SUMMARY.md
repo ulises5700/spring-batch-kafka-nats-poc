@@ -27,7 +27,7 @@ Implementamos una **EDA Híbrida** que divide el flujo en un "Camino Caliente" (
 - **Resultado**: Las transacciones aprobadas se almacenan de forma segura incluso si el sistema de liquidación está fuera de línea.
 
 ### 📦 El Motor de Liquidación (Settlement Engine)
-- **Tecnología**: **Spring Batch** + **Base de Datos H2**.
+- **Tecnología**: **Spring Batch** + **PostgreSQL** (con migración Flyway).
 - **Rol**: Procesamiento al final del día (o micro-batches).
 - **¿Por qué?**: El procesamiento de archivos de pago requiere transacciones ACID y grandes volúmenes. Spring Batch gestiona bloques (chunks), reintentos y generación de archivos de forma robusta.
 
@@ -39,6 +39,7 @@ Implementamos una **EDA Híbrida** que divide el flujo en un "Camino Caliente" (
 - **Kafka + Zookeeper**: La columna vertebral de mensajería.
 - **NATS Server**: Nervio de mensajería de alto rendimiento.
 - **Microservicios**: 3 aplicaciones Spring Boot corriendo en paralelo.
+- **Automatización**: Script `start-dev-env.ps1` para inicialización en un solo click (Clean Code/DevEx).
 
 ### B. Mapa de Microservicios
 | Servicio | Stack Tecnológico | Responsabilidad |
@@ -61,6 +62,7 @@ Un "Centro de Comando" en tiempo real construido con **Vue.js 3 + Tailwind CSS**
 2.  **Estrategia de Doble Broker**: Usar la herramienta adecuada para cada tarea (NATS para velocidad, Kafka para almacenamiento persistente).
 3.  **Patrón Stream-to-Batch**: Almacenar datos de un flujo (Kafka) en una tabla de base de datos antes de un procesamiento por lotes, patrón común en procesos ETL financieros.
 4.  **Monitoreo Full-Stack**: Integración de logs estándar de Java (`Logback`) con WebSockets para crear una experiencia de "Live Tail" en el navegador.
+5.  **Automatización de Entorno (DevEx)**: Uso de scripts de PowerShell para reducir la fricción de inicio (One-Click Start), asegurando que cualquier desarrollador pueda levantar el entorno complejo en segundos.
 
 ---
 
@@ -73,7 +75,7 @@ El sistema está **completamente operativo** ejecutándose localmente.
 - [x] **Tráfico**: Simulador generando exitosamente transacciones aprobadas y rechazadas.
 
 ### Próximos Pasos para Producción 🚀
-- Reemplazar H2 con **PostgreSQL**.
+- Refinar configuraciones de producción de PostgreSQL.
 - Habilitar **SSL/TLS** para NATS y Kafka.
 - Desplegar en **Kubernetes** con charts de Helm.
 - Reemplazar los stubs de fraude con modelos reales de ML.
