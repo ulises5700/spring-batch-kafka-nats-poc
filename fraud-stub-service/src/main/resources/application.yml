@@ -1,0 +1,40 @@
+server:
+  port: 8082
+
+spring:
+  application:
+    name: fraud-stub-service
+
+# NATS Configuration
+nats:
+  server:
+    url: nats://localhost:4222
+  connection:
+    name: fraud-stub-service
+  subject:
+    fraud-check: fraud.check
+
+# Fraud Detection Rules Configuration
+fraud:
+  threshold:
+    amount: 1000
+    currency: USD
+
+# Logging Configuration
+logging:
+  level:
+    root: INFO
+    com.fintech.fraud: DEBUG
+    io.nats: INFO
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
+
+# Actuator for health checks
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: always

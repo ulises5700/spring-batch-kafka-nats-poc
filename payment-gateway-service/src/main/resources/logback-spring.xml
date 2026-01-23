@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
+    
+    <!-- Console Appender -->
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} %highlight(%-5level) %cyan(%logger{20}) - %msg%n</pattern>
+        </encoder>
+    </appender>
+    
+    <!-- Custom WebSocket Appender -->
+    <appender name="WEBSOCKET" class="com.fintech.gateway.monitoring.WebSocketLogAppender"/>
+    
+    <!-- Application Loggers -->
+    <logger name="com.fintech" level="DEBUG" additivity="false">
+        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="WEBSOCKET"/>
+    </logger>
+    
+    <logger name="org.springframework.kafka" level="INFO" additivity="false">
+        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="WEBSOCKET"/>
+    </logger>
+    
+    <logger name="io.nats" level="INFO" additivity="false">
+        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="WEBSOCKET"/>
+    </logger>
+    
+    <!-- Root Logger -->
+    <root level="INFO">
+        <appender-ref ref="CONSOLE"/>
+    </root>
+</configuration>

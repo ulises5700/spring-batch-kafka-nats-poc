@@ -1,0 +1,47 @@
+server:
+  port: 8083
+
+spring:
+  application:
+    name: settlement-batch-job
+  datasource:
+    url: jdbc:h2:file:./data/settlement-db;DB_CLOSE_DELAY=-1
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: 
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+  kafka:
+    bootstrap-servers: localhost:9092
+    consumer:
+      group-id: settlement-service-group
+      auto-offset-reset: earliest
+      enable-auto-commit: false
+  batch:
+    job:
+      enabled: false
+    jdbc:
+      initialize-schema: always
+
+settlement:
+  batch:
+    chunk-size: 100
+  output:
+    directory: ./output
+
+logging:
+  level:
+    root: INFO
+    com.fintech.settlement: DEBUG
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
